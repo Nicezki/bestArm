@@ -16,8 +16,10 @@ unsigned long currentMillis = millis();
 #define SERVO_05_PIN 10
 #define SERVO_06_PIN 11
 
-Servo servo1, servo2, servo3, servo4, servo5, servo6;
-Servo* servo[] = {&servo1, &servo2, &servo3, &servo4, &servo5, &servo6};
+Servo servo[6];
+
+int servoPins[6] = {3, 5, 6, 9, 10, 11};
+
 
 int sAngle[] = {0, 0, 0, 0, 0, 0};
 
@@ -29,16 +31,14 @@ char inputBuffer[10]; // Buffer to store serial input
 int bufferIndex = 0; // Index for input buffer
 
 void setup() {
-  // Pinmode for Servo
-  int servoPins[] = {SERVO_01_PIN, SERVO_02_PIN, SERVO_03_PIN, SERVO_04_PIN, SERVO_05_PIN, SERVO_06_PIN};
-
   for (int i = 0; i < 5; i++) {
     pinMode(servoPins[i], OUTPUT);
   }
   // Attach servo to pin
   for (int i = 0; i < 5; i++) {
-    servo[i]->attach(servoPins[i]);
+    servo[i].attach(servoPins[i], 500, 2500);
   }
+
   Serial.begin(9600);
   resetServo();
   Serial.println("Ready!");
@@ -128,16 +128,16 @@ void servoControl(int ServoNo, int degree){
   if (degree > 110 && ServoNo == 3) {
     degree = 110;
   }
-  servo[ServoNo]->write(degree);
+  servo[ServoNo].write(degree);
   Serial.print("S ");
   Serial.print(ServoNo);
   Serial.print(" at: ");
-  Serial.println(servo[ServoNo]->read());
+  Serial.println(servo[ServoNo].read());
 
 }
 
 void smoothServoControl(int ServoNo, int targetDegree, int step = 1, int delayTime = 10) {
-  int currentDegree = servo[ServoNo]->read();
+  int currentDegree = servo[ServoNo].read();
 
   if (targetDegree > 180) {
     targetDegree = 180;
@@ -163,11 +163,11 @@ void smoothServoControl(int ServoNo, int targetDegree, int step = 1, int delayTi
         currentDegree = targetDegree;
       }
 
-      servo[ServoNo]->write(currentDegree);
+      servo[ServoNo].write(currentDegree);
         Serial.print("S ");
         Serial.print(ServoNo);
         Serial.print(" at: ");
-        Serial.println(servo[ServoNo]->read());
+        Serial.println(servo[ServoNo].read());
       
       previousMillis = millis();
     }
@@ -209,20 +209,20 @@ void resetServo(){
 
 
   smoothServoControl(0, 0);
-  delay(500);
+  // delay(500);
   smoothServoControl(1, 145);
-  delay(1500);
+  // delay(1500);
   smoothServoControl(2, 40);
-  delay(500);
+  // delay(500);
   smoothServoControl(3, 110); ///ตัวอวศา gripper
-  delay(500);
+  // delay(500);
   smoothServoControl(4, 0);  ///เอียง gripper
   smoothServoControl(4, 90); ///เอียง gripper
   smoothServoControl(4, 0);   ///เอียง gripper
   smoothServoControl(4, 90);  ///เอียง gripper
-  delay(500);
+  // delay(500);
   smoothServoControl(5, 0);
-  delay(5000);
+  // delay(5000);
 
   
 }
